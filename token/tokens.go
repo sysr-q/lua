@@ -9,6 +9,7 @@ type Token int
 
 const (
 	EOF Token = iota
+	Error
 	Space
 
 	FunctionName
@@ -107,7 +108,7 @@ var tokens = []string{
 	OpenParen:  "open-paren",
 	CloseParen: "close-paren",
 
-	Comment: "--[[ --]]",
+	Comment: "comment", // "--[[ --]]",
 
 	Nil:            "nil",
 	StringLiteral:  "string-literal",

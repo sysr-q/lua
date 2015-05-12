@@ -18,6 +18,7 @@ const (
 
 var tokenTypes = map[Token]Type{
 	EOF:   InvalidType,
+	Error: InvalidType,
 	Space: WhitespaceType,
 
 	FunctionName: IdentifierType,
