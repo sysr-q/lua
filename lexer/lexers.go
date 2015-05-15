@@ -30,7 +30,6 @@ func lexText(l *lexer) stateFn {
 	}
 
 	if strings.HasPrefix(l.input[l.pos:], "--[") {
-		// TODO
 		return lexBlockComment
 	}
 
@@ -52,7 +51,6 @@ func lexText(l *lexer) stateFn {
 	}
 
 	if l.peek() == '[' {
-		// TODO
 		return lexDoubleBracketStringLiteral
 	}
 
@@ -109,7 +107,7 @@ func lexBlockComment(l *lexer) stateFn {
 
 	equalsRun := l.acceptRun("=")
 	if !l.accept("[") {
-		l.errorf("didn't find another opening bracket")
+		return l.errorf("didn't find another opening bracket")
 	}
 
 	for {
@@ -122,9 +120,10 @@ func lexBlockComment(l *lexer) stateFn {
 				// Not the same amount as when we opened this string.
 				continue
 			}
-			l.accept("]")
+			if !l.accept("]") {
+				return l.errorf("didn't find closing bracket")
+			}
 			l.ignore()
-			//l.emit(token.Comment)
 			return lexText
 		}
 	}
@@ -139,7 +138,6 @@ func lexLineComment(l *lexer) stateFn {
 
 	l.pos += token.Pos(lineLength)
 	l.ignore()
-	//l.emit(token.Comment)
 	return lexText
 }
 
@@ -176,7 +174,7 @@ func lexDoubleBracketStringLiteral(l *lexer) stateFn {
 	l.next()
 	equalsRun := l.acceptRun("=")
 	if !l.accept("[") {
-		l.errorf("didn't find another opening bracket")
+		return l.errorf("didn't find another opening bracket")
 	}
 
 	// Potentially eat up a newline.
@@ -192,7 +190,9 @@ func lexDoubleBracketStringLiteral(l *lexer) stateFn {
 				// Not the same amount as when we opened this string.
 				continue
 			}
-			l.accept("]")
+			if !l.accept("]") {
+				return l.errorf("didn't find closing bracket")
+			}
 			l.emit(token.StringLiteral)
 			return lexText
 		}
